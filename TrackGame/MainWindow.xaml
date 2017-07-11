@@ -7,8 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="600">
     <Grid x:Name="Grid_Ground" HorizontalAlignment="Left" VerticalAlignment="Top" >
-        <Canvas  x:Name="Canvas_Ground" Height="300" Width="420">
-           
-        </Canvas>
+        <StackPanel Orientation="Horizontal">
+            <Canvas  x:Name="Canvas_Ground" Height="300" Width="420">
+
+            </Canvas>
+            <Button Width="100" Height="30" HorizontalAlignment="Right" Click="Button_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

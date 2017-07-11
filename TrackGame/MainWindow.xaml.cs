@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -20,6 +21,8 @@ namespace TrackGame
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private Button button = new Button();
+
 		private readonly int 地块数量 = 35;
 		private readonly int 地块尺寸 = 50;
 		private readonly Point 起点坐标 = new Point(1, 2);
@@ -28,11 +31,11 @@ namespace TrackGame
 
 		PathSegmentCollection segmentCollection;
 		Path path;
-
+		PathGeometry pathGeometry;
 		private void 初始化路径(Point startPoint)
 		{
 			this.path = new Path();
-			PathGeometry pathGeometry = new PathGeometry();
+			pathGeometry = new PathGeometry();
 			PathFigure pathFigure = new PathFigure();
 			pathFigure.StartPoint = new Point((startPoint.X * this.地块尺寸) + (this.地块尺寸 * 0.5), (startPoint.Y * this.地块尺寸) + (this.地块尺寸 * 0.5));
 			segmentCollection = new PathSegmentCollection();
@@ -50,6 +53,11 @@ namespace TrackGame
 			InitializeComponent();
 			this.初始化地图();
 			this.设置起点地块(this.起点坐标);
+
+			button.Width = 80;
+			button.Height = 30;
+			
+			this.Canvas_Ground.Children.Add(button);
 		}
 
 		private void 初始化地图()
@@ -126,7 +134,7 @@ namespace TrackGame
 			{
 				var X坐标 = 当前地块.坐标.X;
 				var Y坐标 = 当前地块.坐标.Y;
-				switch (当前地块.路线.终点)
+				switch (当前地块.路线.终点方向)
 				{
 					case 方向.左: { if (当前地块.坐标.X > 0) X坐标 = 当前地块.坐标.X - 1; break; }
 					case 方向.右: { if (当前地块.坐标.X < 6) X坐标 = 当前地块.坐标.X + 1; break; }
@@ -154,23 +162,99 @@ namespace TrackGame
 			{
 				var 节点坐标 = new Point((当前地块.坐标.X + 当前地块.路线.终点坐标.X) * 当前地块.Width, (当前地块.坐标.Y + 当前地块.路线.终点坐标.Y) * 当前地块.Height);
 
-				if (当前地块.路线.起点 == 方向.右 && 当前地块.路线.终点 == 方向.上 ||
-					当前地块.路线.起点 == 方向.下 && 当前地块.路线.终点 == 方向.右 ||
-					当前地块.路线.起点 == 方向.左 && 当前地块.路线.终点 == 方向.下 ||
-					当前地块.路线.起点 == 方向.上 && 当前地块.路线.终点 == 方向.左)
+				if (当前地块.路线.起点方向 == 方向.右 && 当前地块.路线.终点方向 == 方向.上 ||
+					当前地块.路线.起点方向 == 方向.下 && 当前地块.路线.终点方向 == 方向.右 ||
+					当前地块.路线.起点方向 == 方向.左 && 当前地块.路线.终点方向 == 方向.下 ||
+					当前地块.路线.起点方向 == 方向.上 && 当前地块.路线.终点方向 == 方向.左)
 				{
 					result = new ArcSegment(节点坐标, new Size(当前地块.Width / 2, 当前地块.Height / 2), 90, false, SweepDirection.Clockwise, true);
 				}
-				else if (当前地块.路线.起点 == 方向.左 && 当前地块.路线.终点 == 方向.上 ||
-					当前地块.路线.起点 == 方向.下 && 当前地块.路线.终点 == 方向.左 ||
-					当前地块.路线.起点 == 方向.右 && 当前地块.路线.终点 == 方向.下 ||
-					当前地块.路线.起点 == 方向.上 && 当前地块.路线.终点 == 方向.右)
+				else if (当前地块.路线.起点方向 == 方向.左 && 当前地块.路线.终点方向 == 方向.上 ||
+					当前地块.路线.起点方向 == 方向.下 && 当前地块.路线.终点方向 == 方向.左 ||
+					当前地块.路线.起点方向 == 方向.右 && 当前地块.路线.终点方向 == 方向.下 ||
+					当前地块.路线.起点方向 == 方向.上 && 当前地块.路线.终点方向 == 方向.右)
 				{
 					result = new ArcSegment(节点坐标, new Size(当前地块.Width / 2, 当前地块.Height / 2), 90, false, SweepDirection.Counterclockwise, true);
 				}
 				else result = new LineSegment() { Point = 节点坐标 };
 			}
 			return result;
+		}
+
+
+		private void 开火车(FrameworkElement element, Path path, double speed)
+		{
+			element.RenderTransformOrigin = new Point(0.5, 0.5);
+
+			TranslateTransform translate = new TranslateTransform();
+			RotateTransform rotate = new RotateTransform();
+			TransformGroup group = new TransformGroup();
+			group.Children.Add(rotate);//先旋转
+			group.Children.Add(translate);//再平移
+			element.RenderTransform = group;
+
+			NameScope.SetNameScope(this, new NameScope());
+			this.RegisterName(nameof(translate), translate);
+			this.RegisterName(nameof(rotate), rotate);
+
+			DoubleAnimationUsingPath animationX = new DoubleAnimationUsingPath();
+			animationX.PathGeometry = path.Data.GetFlattenedPathGeometry();
+			animationX.Source = PathAnimationSource.X;
+			animationX.Duration = new Duration(TimeSpan.FromSeconds(speed));
+
+			DoubleAnimationUsingPath animationY = new DoubleAnimationUsingPath();
+			animationY.PathGeometry = path.Data.GetFlattenedPathGeometry();
+			animationY.Source = PathAnimationSource.Y;
+			animationY.Duration = animationX.Duration;
+
+			DoubleAnimationUsingPath animationAngle = new DoubleAnimationUsingPath();
+			animationAngle.PathGeometry = path.Data.GetFlattenedPathGeometry();
+			animationAngle.Source = PathAnimationSource.Angle;
+			animationAngle.Duration = animationX.Duration;
+
+			Storyboard story = new Storyboard();
+			story.RepeatBehavior = new RepeatBehavior(1);//RepeatBehavior.Forever;
+			story.AutoReverse = false;
+			story.Children.Add(animationX);
+			story.Children.Add(animationY);
+			story.Children.Add(animationAngle);
+			Storyboard.SetTargetName(animationX, nameof(translate));
+			Storyboard.SetTargetName(animationY, nameof(translate));
+			Storyboard.SetTargetName(animationAngle, nameof(rotate));
+			Storyboard.SetTargetProperty(animationX, new PropertyPath(TranslateTransform.XProperty));
+			Storyboard.SetTargetProperty(animationY, new PropertyPath(TranslateTransform.YProperty));
+			Storyboard.SetTargetProperty(animationAngle, new PropertyPath(RotateTransform.AngleProperty));
+			story.Completed += (s, e) => { MessageBox.Show(""); };
+			story.Begin(this);
+		}
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			Path path = new Path();
+			PathGeometry pathGeometry = new PathGeometry();
+			ArcSegment arc = new ArcSegment(new Point(100, 200), new Size(50, 100), 0, false, SweepDirection.Counterclockwise, true);
+			PathFigure figure = new PathFigure();
+			figure.StartPoint = new Point(100, 0);
+			figure.Segments.Add(arc);
+			pathGeometry.Figures.Add(figure);
+			path.Data = pathGeometry;
+			path.Stroke = Brushes.Red;
+			path.StrokeThickness = 4;
+			this.Canvas_Ground.Children.Add(path);
+
+			
+
+
+			LineGeometry myLineGeometry = new LineGeometry();
+			myLineGeometry.StartPoint = new Point(200,50);
+			myLineGeometry.EndPoint = new Point(100, 90);
+
+			Path myPath = new Path();
+			myPath.Stroke = Brushes.Red;
+			myPath.StrokeThickness = 4;
+			myPath.Data = myLineGeometry;
+
+			this.Canvas_Ground.Children.Add(myPath);
 		}
 	}
 }

@@ -101,7 +101,7 @@ namespace TrackGame
 			this.前一次随机数 = 当前随机数;
 
 			// 路线有两条 根据上一个路线的终点来确定本次路线
-			this.路线 = this.路线集.FirstOrDefault(o => o.起点 == 上一地块.路线.终点接点);
+			this.路线 = this.路线集.FirstOrDefault(o => o.起点方向 == 上一地块.路线.接点方向);
 		}
 
 		public void 设为起点()
