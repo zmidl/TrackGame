@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrackGame"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="600">
+        Title="MainWindow" Height="700" Width="1200">
     <Grid x:Name="Grid_Ground" HorizontalAlignment="Left" VerticalAlignment="Top" >
         <StackPanel Orientation="Horizontal">
-            <Canvas  x:Name="Canvas_Ground" Height="300" Width="420">
+            <Canvas  x:Name="Canvas_Ground" Height="600" Width="840">
 
             </Canvas>
             <Button Width="100" Height="30" HorizontalAlignment="Right" Click="Button_Click"/>
