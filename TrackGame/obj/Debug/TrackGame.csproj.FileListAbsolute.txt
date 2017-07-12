@@ -49,3 +49,4 @@ C:\zhaomin\sourcecode\TrackGame\TrackGame\obj\Debug\TrackGame.g.resources
 C:\zhaomin\sourcecode\TrackGame\TrackGame\obj\Debug\TrackGame.Properties.Resources.resources
 C:\zhaomin\sourcecode\TrackGame\TrackGame\obj\Debug\TrackGame.csproj.GenerateResource.Cache
 C:\zhaomin\sourcecode\TrackGame\TrackGame\bin\Debug\images\火车.png
+D:\Develop\MyProject\TrackGame\TrackGame\bin\Debug\images\火车.png

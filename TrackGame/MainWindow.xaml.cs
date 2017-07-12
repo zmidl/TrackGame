@@ -21,20 +21,21 @@ namespace TrackGame
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private Image 火车 = new Image();
+
 		private readonly int 地块数量 = 35;
 		private readonly int 地块尺寸 = 100;
+		private readonly Point 关键坐标 = new Point(5, 2);
 		private readonly Point 起点坐标 = new Point(1, 1);
 		private readonly Point 终点坐标 = new Point(1, 3);
+		private Rectangle 关键地块;
+		private Image 火车 = new Image();
 		private List<地块> 地块列队;
-		private List<地块> 已铺地块列队 = new List<地块>(35);
-		private List<Path> 路径集合 = new List<Path>();
-		private Point 关键坐标 = new Point(5,2);
-
+		private List<地块> 已铺地块列队;
+		private List<Path> 路径集合;
 
 		private void 初始化路径(Point startPoint)
 		{
-
+			this.路径集合 = new List<Path>(this.地块数量);
 			var sp = new Point((startPoint.X * this.地块尺寸) + (this.地块尺寸 * 0.5), (startPoint.Y * this.地块尺寸) + (this.地块尺寸 * 0.5));
 			var ep = new Point((startPoint.X * this.地块尺寸) + this.地块尺寸, (startPoint.Y * this.地块尺寸) + (this.地块尺寸 * 0.5));
 			var 路径 = this.计算路径(sp, ep);
@@ -53,6 +54,7 @@ namespace TrackGame
 		private void 初始化地图()
 		{
 			this.地块列队 = new List<地块>(this.地块数量);
+			this.已铺地块列队 = new List<地块>(this.地块数量);
 			for (int i = 0; i < this.地块数量; i++)
 			{
 				var 地块对象 = new 地块(new Point(i % 7, i / 7), 类型.无)
@@ -63,17 +65,17 @@ namespace TrackGame
 					Margin = new Thickness((i % 7) * this.地块尺寸, (i / 7) * this.地块尺寸, 0, 0),
 					IsEnabled = false
 				};
-
-				if (i == ((int)this.关键坐标.Y * 7 + this.关键坐标.X))
-				{
-					地块对象.BorderThickness = new Thickness(4);
-					地块对象.BorderBrush = Brushes.Red;
-				}
 				地块对象.Click += 铺设铁轨;
-
 				this.地块列队.Add(地块对象);
 				this.Canvas_Ground.Children.Add(地块对象);
 			}
+			this.关键地块 = new Rectangle();
+			this.关键地块.Margin = new Thickness(this.关键坐标.X * this.地块尺寸, this.关键坐标.Y * this.地块尺寸, 0, 0);
+			this.关键地块.Stroke = Brushes.CornflowerBlue;
+			this.关键地块.RadiusX = this.关键地块.RadiusY = 5;
+			this.关键地块.StrokeThickness = 4;
+			this.关键地块.Width = this.关键地块.Height = this.地块尺寸;
+			this.Canvas_Ground.Children.Add(this.关键地块);
 		}
 
 		private 地块 下一地块缓存;
@@ -107,7 +109,7 @@ namespace TrackGame
 			地块 下一地块 = this.获取下一地块(当前铺设的地块);
 
 			this.下一地块缓存 = 下一地块;
-			
+
 			if (下一地块 != null)
 			{
 				if (下一地块.类型 != 类型.终点) 下一地块.IsEnabled = true;//this.Title = "成功";
