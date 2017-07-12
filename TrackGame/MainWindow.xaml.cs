@@ -21,14 +21,16 @@ namespace TrackGame
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private Button button = new Button();
-
+		private Image 火车 = new Image();
 		private readonly int 地块数量 = 35;
 		private readonly int 地块尺寸 = 100;
-		private readonly Point 起点坐标 = new Point(1, 2);
+		private readonly Point 起点坐标 = new Point(1, 1);
+		private readonly Point 终点坐标 = new Point(1, 3);
 		private List<地块> 地块列队;
 		private List<地块> 已铺地块列队 = new List<地块>(35);
 		private List<Path> 路径集合 = new List<Path>();
+		private Point 关键坐标 = new Point(5,2);
+
 
 		private void 初始化路径(Point startPoint)
 		{
@@ -45,11 +47,7 @@ namespace TrackGame
 			InitializeComponent();
 			this.初始化地图();
 			this.设置起点地块(this.起点坐标);
-
-			button.Width = 80;
-			button.Height = 30;
-
-			this.Canvas_Ground.Children.Add(button);
+			this.设置终点地块(this.终点坐标);
 		}
 
 		private void 初始化地图()
@@ -65,6 +63,12 @@ namespace TrackGame
 					Margin = new Thickness((i % 7) * this.地块尺寸, (i / 7) * this.地块尺寸, 0, 0),
 					IsEnabled = false
 				};
+
+				if (i == ((int)this.关键坐标.Y * 7 + this.关键坐标.X))
+				{
+					地块对象.BorderThickness = new Thickness(4);
+					地块对象.BorderBrush = Brushes.Red;
+				}
 				地块对象.Click += 铺设铁轨;
 
 				this.地块列队.Add(地块对象);
@@ -76,8 +80,6 @@ namespace TrackGame
 
 		private void 铺设铁轨(object sender, RoutedEventArgs e)
 		{
-			
-
 			// 由于重新设置地块 所以前一次计算的“下一地块”需要重置
 			if (this.下一地块缓存 != null) this.下一地块缓存.IsEnabled = false;
 
@@ -98,14 +100,22 @@ namespace TrackGame
 					this.Canvas_Ground.Children.RemoveAt(this.Canvas_Ground.Children.Count - 1);
 				}
 			}
-			
+
 			// 需要上一段铁轨的信息 来确定当前铁轨的路径
 			当前铺设的地块.随机变化地块(this.已铺地块列队[this.已铺地块列队.Count - 2]);
+
 			地块 下一地块 = this.获取下一地块(当前铺设的地块);
 
 			this.下一地块缓存 = 下一地块;
-
-			if (下一地块 != null) 下一地块.IsEnabled = true;//this.Title = "成功";
+			
+			if (下一地块 != null)
+			{
+				if (下一地块.类型 != 类型.终点) 下一地块.IsEnabled = true;//this.Title = "成功";
+				else
+				{
+					if (当前铺设的地块.路线.终点方向 == 下一地块.路线.接点方向) 当前铺设的地块.IsEnabled = false;
+				}
+			}
 
 			var 当前路径 = this.画节点路径(当前铺设的地块);
 			if (当前路径 != null)
@@ -113,14 +123,18 @@ namespace TrackGame
 				this.路径集合.Add(当前路径);
 				this.Canvas_Ground.Children.Add(当前路径);
 			}
-			//else this.Canvas_Ground.Children.Remove(当前路径);
-
-
-			//this.Title = this.路径集合.Count.ToString();
 		}
 
 		private void 设置起点地块(Point 起点坐标)
 		{
+			火车.Width = 70;
+			火车.Height = 30;
+			this.火车.Stretch = Stretch.Uniform;
+			this.火车.Source = new BitmapImage(new Uri(System.IO.Directory.GetCurrentDirectory() + $@"\images\火车.png", UriKind.RelativeOrAbsolute));
+			this.Canvas_Ground.Children.Add(火车);
+			Canvas.SetLeft(this.火车, (起点坐标.X + 0.5) * this.地块尺寸 - this.火车.Width / 2);
+			Canvas.SetTop(this.火车, (起点坐标.Y + 0.5) * this.地块尺寸 - this.火车.Height / 2);
+
 			var 起点地块 = this.地块列队.FirstOrDefault(o => o.坐标.Equals(起点坐标));
 			this.已铺地块列队.Add(起点地块);
 			起点地块.设为起点();
@@ -128,11 +142,12 @@ namespace TrackGame
 			this.初始化路径(起点坐标);
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="当前地块"></param>
-		/// <returns></returns>
+		private void 设置终点地块(Point 终点坐标)
+		{
+			var 终点地块 = this.地块列队.FirstOrDefault(o => o.坐标.Equals(终点坐标));
+			终点地块.设为终点();
+		}
+
 		private 地块 获取下一地块(地块 当前地块)
 		{
 			var 下一地块 = default(地块);
@@ -154,6 +169,7 @@ namespace TrackGame
 					{
 						下一地块 = this.地块列队.FirstOrDefault(o => o.坐标 == 下一地块坐标);
 					}
+					else if (下一地块坐标 == this.终点坐标) 下一地块 = this.已铺地块列队.FirstOrDefault(o => o.坐标 == this.终点坐标);
 				}
 			}
 			//if (下一地块 != null) 下一地块.IsEnabled = true;
@@ -189,10 +205,12 @@ namespace TrackGame
 			return result;
 		}
 
-
 		private void 开火车(FrameworkElement element, List<Path> paths, double speed)
 		{
 			var path = paths[0];
+			Canvas.SetTop(element, -element.ActualHeight / 2);
+			Canvas.SetLeft(element, -element.ActualWidth / 2);
+
 			element.RenderTransformOrigin = new Point(0.5, 0.5);
 
 			TranslateTransform translate = new TranslateTransform();
@@ -233,7 +251,7 @@ namespace TrackGame
 			Storyboard.SetTargetProperty(animationX, new PropertyPath(TranslateTransform.XProperty));
 			Storyboard.SetTargetProperty(animationY, new PropertyPath(TranslateTransform.YProperty));
 			Storyboard.SetTargetProperty(animationAngle, new PropertyPath(RotateTransform.AngleProperty));
-			story.Completed += (s, e) => 
+			story.Completed += (s, e) =>
 			{
 				if (paths.Count > 1)
 				{
@@ -250,13 +268,13 @@ namespace TrackGame
 
 		private void Button_Click(object sender, RoutedEventArgs e)
 		{
-			this.开火车(button, this.路径集合, 1);
+			this.开火车(火车, this.路径集合, 1);
 		}
 
 		private Path 计算路径(Point 起点, Point 终点, SweepDirection? 方向 = null)
 		{
 			var 结果 = new Path();
-			结果.Stroke = Brushes.Red;
+			结果.Stroke = Brushes.Transparent;
 			结果.StrokeThickness = 4;
 			switch (方向)
 			{

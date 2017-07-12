@@ -13,6 +13,7 @@
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e5%b7%a6%e4%b8%8b.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e5%b7%a6%e5%8f%b3.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e6%97%a0.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e7%81%ab%e8%bd%a6.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e7%a9%ba.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e7%bb%88%e7%82%b9.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/%e8%b5%b7%e7%82%b9.png")]

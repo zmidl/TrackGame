@@ -114,6 +114,9 @@
     <Content Include="images\无.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="images\火车.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="images\空.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

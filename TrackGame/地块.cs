@@ -81,6 +81,7 @@ namespace TrackGame
 				case 类型.终点:
 				{
 					this.路线集.Add(new 路线(方向.右, 方向.左));
+					this.路线 = this.路线集[0];
 					break;
 				}
 				default: break;
