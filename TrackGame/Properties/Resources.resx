@@ -117,7 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="游戏信息1" xml:space="preserve">
+  <data name="开始游戏" xml:space="preserve">
+    <value>开始游戏</value>
+  </data>
+  <data name="很可惜游戏失败" xml:space="preserve">
+    <value>很可惜游戏失败</value>
+  </data>
+  <data name="恭喜你游戏获胜" xml:space="preserve">
+    <value>恭喜你游戏获胜</value>
+  </data>
+  <data name="火车倒计时" xml:space="preserve">
+    <value>火车将在：{0}秒后出发</value>
+  </data>
+  <data name="火车将已经出发了" xml:space="preserve">
+    <value>火车将已经出发了</value>
+  </data>
+  <data name="点击按钮开始游戏" xml:space="preserve">
     <value>点击按钮开始游戏</value>
   </data>
 </root>

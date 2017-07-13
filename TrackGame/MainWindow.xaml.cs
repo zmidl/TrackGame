@@ -52,7 +52,7 @@ namespace TrackGame
 
 		private void 初始化游戏()
 		{
-			this.游戏信息.Text = $"开始游戏";
+			this.游戏信息.Text = Properties.Resources.开始游戏;
 			this.初始化地图();
 			this.初始化起点(this.起点坐标);
 			this.初始化终点(this.终点坐标);
@@ -72,20 +72,19 @@ namespace TrackGame
 		private void 游戏开始倒计时_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
 			this.倒计时变量--;
-			if (倒计时变量== 0)
+			if (倒计时变量 == 0)
 			{
 				this.游戏开始倒计时.Stop();
-				Application.Current.Dispatcher.Invoke(()=>
+				Application.Current.Dispatcher.Invoke(() =>
 				{
 					this.开火车(火车, this.路径集合, 2);
-					this.游戏信息.Text = $"火车将已经出发了";
+					this.游戏信息.Text = Properties.Resources.火车将已经出发了;
 				});
 			}
 			else
 			{
-				Application.Current.Dispatcher.Invoke(() => this.游戏信息.Text = $"火车将在：{倒计时变量}秒后出发");
+				Application.Current.Dispatcher.Invoke(() => this.游戏信息.Text = string.Format(Properties.Resources.火车倒计时, this.倒计时变量));
 			}
-			
 		}
 
 		private void 初始化地图()
@@ -306,8 +305,8 @@ namespace TrackGame
 				}
 				else
 				{
-					if (this.是否铺完铁轨 && this.已铺地块列队.FirstOrDefault(o => o.坐标.Equals(this.关键坐标)) != null) this.游戏信息.Text = $"恭喜你游戏获胜";
-					else this.游戏信息.Text = $"很可惜游戏失败";
+					if (this.是否铺完铁轨 && this.已铺地块列队.FirstOrDefault(o => o.坐标.Equals(this.关键坐标)) != null) this.游戏信息.Text = Properties.Resources.恭喜你游戏获胜;
+					else this.游戏信息.Text = Properties.Resources.很可惜游戏失败;
 					this.开始游戏按钮.IsEnabled = true;
 				}
 			};
@@ -347,7 +346,6 @@ namespace TrackGame
 
 		private void 开始游戏(object sender, RoutedEventArgs e)
 		{
-			
 			this.初始化游戏();
 			this.开始游戏按钮.IsEnabled = false;
 		}
