@@ -21,17 +21,24 @@ namespace TrackGame
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-
 		private readonly int 地块数量 = 35;
 		private readonly int 地块尺寸 = 100;
 		private readonly Point 关键坐标 = new Point(5, 2);
 		private readonly Point 起点坐标 = new Point(1, 1);
 		private readonly Point 终点坐标 = new Point(1, 3);
 		private Rectangle 关键地块;
-		private Image 火车 = new Image();
+		private Image 火车;
 		private List<地块> 地块列队;
 		private List<地块> 已铺地块列队;
 		private List<Path> 路径集合;
+		private bool 是否铺完铁轨;
+		private System.Timers.Timer 游戏开始倒计时;
+		int 倒计时变量;
+
+		public MainWindow()
+		{
+			InitializeComponent();
+		}
 
 		private void 初始化路径(Point startPoint)
 		{
@@ -40,26 +47,58 @@ namespace TrackGame
 			var ep = new Point((startPoint.X * this.地块尺寸) + this.地块尺寸, (startPoint.Y * this.地块尺寸) + (this.地块尺寸 * 0.5));
 			var 路径 = this.计算路径(sp, ep);
 			this.路径集合.Add(路径);
-			this.Grid_Ground.Children.Add(路径);
+			this.大地.Children.Add(路径);
 		}
 
-		public MainWindow()
+		private void 初始化游戏()
 		{
-			InitializeComponent();
+			this.游戏信息.Text = $"开始游戏";
 			this.初始化地图();
-			this.设置起点地块(this.起点坐标);
-			this.设置终点地块(this.终点坐标);
+			this.初始化起点(this.起点坐标);
+			this.初始化终点(this.终点坐标);
+			this.初始化计时器();
+		}
+
+		private void 初始化计时器()
+		{
+			this.倒计时变量 = 10;
+			this.游戏开始倒计时 = new System.Timers.Timer(1000);
+			this.游戏开始倒计时.AutoReset = true;
+			this.游戏开始倒计时.Enabled = true;
+			this.游戏开始倒计时.Elapsed += 游戏开始倒计时_Elapsed;
+			this.游戏开始倒计时.Start();
+		}
+
+		private void 游戏开始倒计时_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			this.倒计时变量--;
+			if (倒计时变量== 0)
+			{
+				this.游戏开始倒计时.Stop();
+				Application.Current.Dispatcher.Invoke(()=>
+				{
+					this.开火车(火车, this.路径集合, 2);
+					this.游戏信息.Text = $"火车将已经出发了";
+				});
+			}
+			else
+			{
+				Application.Current.Dispatcher.Invoke(() => this.游戏信息.Text = $"火车将在：{倒计时变量}秒后出发");
+			}
+			
 		}
 
 		private void 初始化地图()
 		{
+			this.是否铺完铁轨 = false;
+			this.大地.Children.Clear();
 			this.地块列队 = new List<地块>(this.地块数量);
 			this.已铺地块列队 = new List<地块>(this.地块数量);
 			for (int i = 0; i < this.地块数量; i++)
 			{
 				var 地块对象 = new 地块(new Point(i % 7, i / 7), 类型.无)
 				{
-					Name = $"N_{i % 7}_{i / 7}",
+					//Name = $"N_{i % 7}_{i / 7}",
 					Width = this.地块尺寸,
 					Height = this.地块尺寸,
 					Margin = new Thickness((i % 7) * this.地块尺寸, (i / 7) * this.地块尺寸, 0, 0),
@@ -67,7 +106,7 @@ namespace TrackGame
 				};
 				地块对象.Click += 铺设铁轨;
 				this.地块列队.Add(地块对象);
-				this.Canvas_Ground.Children.Add(地块对象);
+				this.大地.Children.Add(地块对象);
 			}
 			this.关键地块 = new Rectangle();
 			this.关键地块.Margin = new Thickness(this.关键坐标.X * this.地块尺寸, this.关键坐标.Y * this.地块尺寸, 0, 0);
@@ -75,7 +114,7 @@ namespace TrackGame
 			this.关键地块.RadiusX = this.关键地块.RadiusY = 5;
 			this.关键地块.StrokeThickness = 4;
 			this.关键地块.Width = this.关键地块.Height = this.地块尺寸;
-			this.Canvas_Ground.Children.Add(this.关键地块);
+			this.大地.Children.Add(this.关键地块);
 		}
 
 		private 地块 下一地块缓存;
@@ -99,7 +138,7 @@ namespace TrackGame
 				if (当前铺设的地块.路线 != null)
 				{
 					this.路径集合.RemoveAt(this.路径集合.Count - 1);
-					this.Canvas_Ground.Children.RemoveAt(this.Canvas_Ground.Children.Count - 1);
+					this.大地.Children.RemoveAt(this.大地.Children.Count - 1);
 				}
 			}
 
@@ -115,7 +154,11 @@ namespace TrackGame
 				if (下一地块.类型 != 类型.终点) 下一地块.IsEnabled = true;//this.Title = "成功";
 				else
 				{
-					if (当前铺设的地块.路线.终点方向 == 下一地块.路线.接点方向) 当前铺设的地块.IsEnabled = false;
+					if (当前铺设的地块.路线.终点方向 == 下一地块.路线.接点方向)
+					{
+						当前铺设的地块.IsEnabled = false;
+						this.是否铺完铁轨 = true;
+					}
 				}
 			}
 
@@ -123,17 +166,18 @@ namespace TrackGame
 			if (当前路径 != null)
 			{
 				this.路径集合.Add(当前路径);
-				this.Canvas_Ground.Children.Add(当前路径);
+				this.大地.Children.Add(当前路径);
 			}
 		}
 
-		private void 设置起点地块(Point 起点坐标)
+		private void 初始化起点(Point 起点坐标)
 		{
+			this.火车 = new Image();
 			火车.Width = 70;
 			火车.Height = 30;
 			this.火车.Stretch = Stretch.Uniform;
 			this.火车.Source = new BitmapImage(new Uri(System.IO.Directory.GetCurrentDirectory() + $@"\images\火车.png", UriKind.RelativeOrAbsolute));
-			this.Canvas_Ground.Children.Add(火车);
+			this.大地.Children.Add(火车);
 			Canvas.SetLeft(this.火车, (起点坐标.X + 0.5) * this.地块尺寸 - this.火车.Width / 2);
 			Canvas.SetTop(this.火车, (起点坐标.Y + 0.5) * this.地块尺寸 - this.火车.Height / 2);
 
@@ -144,7 +188,7 @@ namespace TrackGame
 			this.初始化路径(起点坐标);
 		}
 
-		private void 设置终点地块(Point 终点坐标)
+		private void 初始化终点(Point 终点坐标)
 		{
 			var 终点地块 = this.地块列队.FirstOrDefault(o => o.坐标.Equals(终点坐标));
 			终点地块.设为终点();
@@ -262,15 +306,12 @@ namespace TrackGame
 				}
 				else
 				{
-					MessageBox.Show("Stop");
+					if (this.是否铺完铁轨 && this.已铺地块列队.FirstOrDefault(o => o.坐标.Equals(this.关键坐标)) != null) this.游戏信息.Text = $"恭喜你游戏获胜";
+					else this.游戏信息.Text = $"很可惜游戏失败";
+					this.开始游戏按钮.IsEnabled = true;
 				}
 			};
 			story.Begin(this);
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			this.开火车(火车, this.路径集合, 1);
 		}
 
 		private Path 计算路径(Point 起点, Point 终点, SweepDirection? 方向 = null)
@@ -302,6 +343,13 @@ namespace TrackGame
 				}
 			}
 			return 结果;
+		}
+
+		private void 开始游戏(object sender, RoutedEventArgs e)
+		{
+			
+			this.初始化游戏();
+			this.开始游戏按钮.IsEnabled = false;
 		}
 	}
 }
