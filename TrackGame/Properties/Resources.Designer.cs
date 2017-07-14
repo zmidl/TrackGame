@@ -63,54 +63,63 @@ namespace TrackGame.Properties {
         /// <summary>
         ///   查找类似 开始游戏 的本地化字符串。
         /// </summary>
-        internal static string 开始游戏 {
+        internal static string 游戏信息_开始游戏 {
             get {
-                return ResourceManager.GetString("开始游戏", resourceCulture);
+                return ResourceManager.GetString("游戏信息_开始游戏", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 很可惜游戏失败 的本地化字符串。
         /// </summary>
-        internal static string 很可惜游戏失败 {
+        internal static string 游戏信息_很可惜游戏失败 {
             get {
-                return ResourceManager.GetString("很可惜游戏失败", resourceCulture);
+                return ResourceManager.GetString("游戏信息_很可惜游戏失败", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 恭喜你游戏获胜 的本地化字符串。
         /// </summary>
-        internal static string 恭喜你游戏获胜 {
+        internal static string 游戏信息_恭喜你游戏获胜 {
             get {
-                return ResourceManager.GetString("恭喜你游戏获胜", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 火车将在：{0}秒后出发 的本地化字符串。
-        /// </summary>
-        internal static string 火车倒计时 {
-            get {
-                return ResourceManager.GetString("火车倒计时", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 火车将已经出发了 的本地化字符串。
-        /// </summary>
-        internal static string 火车将已经出发了 {
-            get {
-                return ResourceManager.GetString("火车将已经出发了", resourceCulture);
+                return ResourceManager.GetString("游戏信息_恭喜你游戏获胜", resourceCulture);
             }
         }
         
         /// <summary>
         ///   查找类似 点击按钮开始游戏 的本地化字符串。
         /// </summary>
-        internal static string 点击按钮开始游戏 {
+        internal static string 游戏信息_点击按钮开始游戏 {
             get {
-                return ResourceManager.GetString("点击按钮开始游戏", resourceCulture);
+                return ResourceManager.GetString("游戏信息_点击按钮开始游戏", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 火车将在：{0}秒后出发 的本地化字符串。
+        /// </summary>
+        internal static string 火车信息_倒计时 {
+            get {
+                return ResourceManager.GetString("火车信息_倒计时", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 火车将已经出发了 的本地化字符串。
+        /// </summary>
+        internal static string 火车信息_已经出发了 {
+            get {
+                return ResourceManager.GetString("火车信息_已经出发了", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 /images/火车.png 的本地化字符串。
+        /// </summary>
+        internal static string 火车图片路径 {
+            get {
+                return ResourceManager.GetString("火车图片路径", resourceCulture);
             }
         }
     }
