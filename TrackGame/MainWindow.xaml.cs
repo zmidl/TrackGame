@@ -38,6 +38,7 @@ namespace TrackGame
 		public MainWindow()
 		{
 			InitializeComponent();
+			this.开始游戏按钮.Click += (s, e) => { this.初始化游戏(); this.开始游戏按钮.IsEnabled = false; };
 		}
 
 		private void 初始化路径()
@@ -342,12 +343,6 @@ namespace TrackGame
 				}
 			}
 			return 结果;
-		}
-
-		private void 开始游戏(object sender, RoutedEventArgs e)
-		{
-			this.初始化游戏();
-			this.开始游戏按钮.IsEnabled = false;
 		}
 	}
 }
